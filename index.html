@@ -181,16 +181,16 @@
 
       <aside class="detail" aria-live="polite">
         <div class="detail-top">
-          <div class="detail-head"><span class="district-kicker">Delaware State Senate</span><span class="tiny" id="detail-stage">All candidates</span></div>
-          <h2 id="district-title">District 1</h2>
-          <div id="district-count"></div>
+          <div class="detail-head"><span class="district-kicker">Delaware State Senate</span><span class="tiny" id="detail-stage">Choose a district</span></div>
+          <h2 id="district-title">Select a district</h2>
+          <div id="district-count">Click a district on the map or use the district menu.</div>
           <div class="legend" aria-label="Party legend">
             <span><i class="dot dem"></i>Democratic</span>
             <span><i class="dot rep"></i>Republican</span>
             <span><i class="dot"></i>Independent</span>
           </div>
         </div>
-        <div class="candidate-list" id="candidate-list"></div>
+        <div class="candidate-list" id="candidate-list"><div class="empty">Candidate filings will appear here after you select a district.</div></div>
         <div class="results">
           <div class="results-head"><h2>Search results</h2><span id="result-count">Type above to search</span></div>
           <div id="search-results"></div>
@@ -216,7 +216,7 @@
     const byDistrict = Object.fromEntries(Array.from({length: 21}, (_, i) => [i + 1, []]));
     ALL_CANDIDATES.forEach(candidate => byDistrict[candidate.district].push(candidate));
 
-    const state = { selected: 1, filter: 'All', query: '' };
+    const state = { selected: null, filter: 'All', query: '' };
     const layer = document.getElementById('district-layer');
     const tooltip = document.getElementById('tooltip');
     const panel = document.getElementById('map-panel');
@@ -336,6 +336,13 @@
     }
 
     function renderDetail() {
+      if (state.selected === null) {
+        districtTitle.textContent = 'Select a district';
+        document.getElementById('detail-stage').textContent = 'Choose a district';
+        districtCount.textContent = 'Click a district on the map or use the district menu.';
+        candidateList.innerHTML = '<div class="empty">Candidate filings will appear here after you select a district.</div>';
+        return;
+      }
       const candidates = visibleCandidates(state.selected);
       districtTitle.textContent = `District ${state.selected}`;
       document.getElementById('detail-stage').textContent = state.filter === 'All' ? 'All candidates' : `${state.filter} list`;
@@ -383,7 +390,7 @@
     searchInput.addEventListener('input', event => { state.query = event.target.value; renderSearch(); });
     document.addEventListener('keydown', event => { if (event.key === 'Escape') { searchInput.value = ''; state.query = ''; renderSearch(); hideTooltip(); } });
 
-    selectDistrict(1);
+    renderDetail();
   </script>
 </body>
 </html>
